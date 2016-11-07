@@ -8,24 +8,31 @@ import javax.imageio.ImageIO;
 import java.util.Random;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.lang.Math;
 
 
 public class ComputerVision
 {
 
+   public static final String WORKING_DIR = "../images/";
+   
    public static void main(String[] args) {
-      String image_name = "images/ashish";
       int NUM_GAUSS = 0;
+      Scanner sc = new Scanner(System.in);
+      System.out.println("Filename: ");
+      String image_name = sc.nextLine();
+      int pos = image_name.lastIndexOf(".");
+      String base_name = image_name.substring(0,pos);
       
       System.out.println("Reading image...");
-      BufferedImage testImage = readImage(image_name + ".jpg");
+      BufferedImage testImage = readImage(WORKING_DIR + image_name);
       System.out.println("Grayscaling...");
       double[][] gray = grayscale(testImage);
       
       System.out.println("Converting to image and writing...");
       BufferedImage grayImage = grayToImage(gray);
-      writeImage(grayImage, image_name + "_gray.png");
+      writeImage(grayImage,WORKING_DIR + base_name + "_gray.png");
       
       double[][] current = gray;
       if(NUM_GAUSS>0) {
@@ -41,9 +48,9 @@ public class ComputerVision
       double[][] thinned = nonmaxsuppression(rawSobelIntensity);
       System.out.println("Converting to image and writing...");
       BufferedImage sobelImage = grayToImage(normalize(sobelRawToParsed(rawSobelIntensity)));
-      writeImage(sobelImage, image_name + "_sobel.png");
+      writeImage(sobelImage, WORKING_DIR + base_name + "_sobel.png");
       BufferedImage thinImage = grayToImage(normalize(thinned));
-      writeImage(thinImage, image_name + "_sobel_thin.png");
+      writeImage(thinImage, WORKING_DIR + base_name + "_sobel_thin.png");
       
       
             
@@ -86,6 +93,14 @@ public class ComputerVision
          }
       }
       return normalized;
+   }
+   
+   public static int[] getHistogram(double[][] img) {
+      return getHistogram(img, 255);
+   }
+   
+   public static int[] getHistogram(double[][] img, int bins) {
+      return null;
    }
    
    public static double[][] nonmaxsuppression(double[][][] rawSobel) {
