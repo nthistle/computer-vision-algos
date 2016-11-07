@@ -16,6 +16,8 @@ public class ComputerVision
 {
 
    public static final String WORKING_DIR = "../images/";
+   public static final int NUM_GAUSS = 0; // make this an input
+   public static final int BIN_SIZE = 256; // decimal grayscaled means this could be higher
    
    public static void main(String[] args) {
       // TODO: make filename and what to do to image command-line arguments
@@ -61,9 +63,16 @@ public class ComputerVision
          writeImage(thinImage, WORKING_DIR + base_name + "_sobel_thin.png");
       
       } else if(choice == 2) {
-         int[] hist = getHistogram(gray);
-         System.out.println("length is " + hist.length);
-         for(int i : hist) System.out.println(i);
+         System.out.println("Calculating Histogram...");
+         int[] hist = getHistogram(gray, BIN_SIZE);
+         System.out.println("Using Otsu Thresholding...");
+         int threshold = otsuThreshold(hist);
+         System.out.println("Found Threshold Value of " + threshold); // will already be in [0,255] range
+         System.out.println("Binarizing Image with Determined Threshold...");
+         double[][] binary = binarize(gray, ((double)threshold)/BIN_SIZE);
+         System.out.println("Converting to image and writing...");
+         BufferedImage binaryImage = grayToImage(binary);
+         writeImage(binaryImage, WORKING_DIR + base_name + "_binary.png");
       }
    }
    
