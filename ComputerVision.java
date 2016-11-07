@@ -178,7 +178,7 @@ public class ComputerVision
          meanA = sumA / weightA;
          meanB = (sum - sumA) / weightB;
          
-         variance = weightA * weightB * (meanA - meanB) * (meanA - meanB);
+         variance = (double)weightA * (double)weightB * (meanA - meanB) * (meanA - meanB);
          
          if(variance > maxVariance) {
             maxVariance = variance;
