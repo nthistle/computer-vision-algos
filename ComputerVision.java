@@ -120,6 +120,19 @@ public class ComputerVision
       return binned;
    }
    
+   public static double[][] binarize(double[][] grayscale, double threshold) {
+      double[][] binaryimg = new double[grayscale.length][grayscale[0].length];
+      for(int i = 0; i < grayscale.length; i ++) {
+         for(int j = 0; j < grayscale[0].length; j ++) {
+            if(grayscale[i][j] > threshold)
+               binaryimg[i][j] = 1.0;
+            else
+               binaryimg[i][j] = 0.0;
+         }
+      }
+      return binaryimg   
+   }
+   
    public static double[][] nonmaxsuppression(double[][][] rawSobel) {
       double[][] thinned = new double[rawSobel.length][rawSobel[0].length];
       double[][] gvals = new double[rawSobel.length][rawSobel[0].length];
