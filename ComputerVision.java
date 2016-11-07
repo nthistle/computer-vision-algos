@@ -18,6 +18,7 @@ public class ComputerVision
    public static final String WORKING_DIR = "../images/";
    
    public static void main(String[] args) {
+      // TODO: make filename and what to do to image command-line arguments
       int NUM_GAUSS = 0;
       Scanner sc = new Scanner(System.in);
       System.out.println("Filename: ");
@@ -30,31 +31,40 @@ public class ComputerVision
       System.out.println("Grayscaling...");
       double[][] gray = grayscale(testImage);
       
-      System.out.println("Converting to image and writing...");
-      BufferedImage grayImage = grayToImage(gray);
-      writeImage(grayImage,WORKING_DIR + base_name + "_gray.png");
+      System.out.println("Choose option: ");
+      System.out.println("1 - Sobel (and Non-max suppression)");
+      System.out.println("2 - Otsu Threshold Binarize");
+      int choice = sc.nextInt();
       
-      double[][] current = gray;
-      if(NUM_GAUSS>0) {
-         System.out.println("Applying Gaussian Blur...");
-         for(int i = 0; i < NUM_GAUSS; i ++) {
-            current = gaussian(current);
+      if(choice == 1) {
+      
+         System.out.println("Converting to image and writing...");
+         BufferedImage grayImage = grayToImage(gray);
+         writeImage(grayImage,WORKING_DIR + base_name + "_gray.png");
+      
+         double[][] current = gray;
+         if(NUM_GAUSS>0) {
+            System.out.println("Applying Gaussian Blur...");
+            for(int i = 0; i < NUM_GAUSS; i ++) {
+               current = gaussian(current);
+            }
          }
+      
+         System.out.println("Applying Sobel...");
+         double[][][] rawSobelIntensity = sobelRaw(current);
+         System.out.println("Applying Non-maximum suppression...");
+         double[][] thinned = nonmaxsuppression(rawSobelIntensity);
+         System.out.println("Converting to image and writing...");
+         BufferedImage sobelImage = grayToImage(normalize(sobelRawToParsed(rawSobelIntensity)));
+         writeImage(sobelImage, WORKING_DIR + base_name + "_sobel.png");
+         BufferedImage thinImage = grayToImage(normalize(thinned));
+         writeImage(thinImage, WORKING_DIR + base_name + "_sobel_thin.png");
+      
+      } else if(choice == 2) {
+         int[] hist = getHistogram(gray);
+         System.out.println("length is " + hist.length);
+         for(int i : hist) System.out.println(i);
       }
-      
-      System.out.println("Applying Sobel...");
-      double[][][] rawSobelIntensity = sobelRaw(current);
-      System.out.println("Applying Non-maximum suppression...");
-      double[][] thinned = nonmaxsuppression(rawSobelIntensity);
-      System.out.println("Converting to image and writing...");
-      BufferedImage sobelImage = grayToImage(normalize(sobelRawToParsed(rawSobelIntensity)));
-      writeImage(sobelImage, WORKING_DIR + base_name + "_sobel.png");
-      BufferedImage thinImage = grayToImage(normalize(thinned));
-      writeImage(thinImage, WORKING_DIR + base_name + "_sobel_thin.png");
-      
-      
-            
-      //writeImage(grayToImage(invert(sobelIntensity)), image_name + "_sobelinverted.png");
    }
    
    public static double[][] invert(double[][] gray) {
@@ -96,11 +106,18 @@ public class ComputerVision
    }
    
    public static int[] getHistogram(double[][] img) {
-      return getHistogram(img, 255);
+      return getHistogram(img, 256);
    }
    
    public static int[] getHistogram(double[][] img, int bins) {
-      return null;
+      int[] binned = new int[bins];
+      // assuming img is in range from [0,1]
+      for(double[] row : img) {
+         for(double d : row) {
+            binned[(int)((bins-1)*d)] ++;
+         }
+      }
+      return binned;
    }
    
    public static double[][] nonmaxsuppression(double[][][] rawSobel) {
