@@ -130,7 +130,54 @@ public class ComputerVision
                binaryimg[i][j] = 0.0;
          }
       }
-      return binaryimg   
+      return binaryimg; 
+   }
+   
+   
+   /**
+    * heavily based off of http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html
+    */
+   public static int otsuThreshold(int[] histogram) {
+      double sum = 0.0;
+      int total = 0;
+      for(int i = 0; i < histogram.length; i ++) {
+         sum += i*histogram[i];
+         total += histogram[i];
+      }
+      // A region is the lower side (black),
+      // B region is the upper side (white)
+      
+      double sumA = 0.0;
+      int weightA = 0;
+      int weightB = 0;
+      
+      double maxVariance = 0;
+      int bestThreshold = 0;
+      
+      double meanA, meanB, variance;
+      
+      for(int i = 0; i < histogram.length; i ++) {
+         weightA += histogram[i];
+         if(weightA == 0) continue;
+         
+         weightB = total - weightA;
+         if(weightB == 0) break;
+         
+         sumA += i*histogram[i];
+         // sumB is sum-sumA
+         
+         meanA = sumA / weightA;
+         meanB = (sum - sumA) / weightB;
+         
+         variance = weightA * weightB * (meanA - meanB) * (meanA - meanB);
+         
+         if(variance > maxVariance) {
+            maxVariance = variance;
+            bestThreshold = i;
+         }
+      }
+      
+      return bestThreshold;
    }
    
    public static double[][] nonmaxsuppression(double[][][] rawSobel) {
