@@ -189,6 +189,18 @@ public class ComputerVision
       return bestThreshold;
    }
    
+   public static int[][] thresholdedges(double[][] edges, double strongThresh, double weakThresh) {
+      // 0 = none
+      // 1 = weak
+      // 2 = strong
+      int[][] thresholded = new int[edges.length][edges[0].length];
+      for(int i = 0; i < edges.length; i ++) {
+         for(int j = 0; j < edges.length; j ++) {
+         
+         }
+      }
+   }
+   
    public static double[][] nonmaxsuppression(double[][][] rawSobel) {
       double[][] thinned = new double[rawSobel.length][rawSobel[0].length];
       double[][] gvals = new double[rawSobel.length][rawSobel[0].length];
@@ -300,6 +312,7 @@ public class ComputerVision
       }
       return grayscaled;
    }
+
 
    public static double[][] sobelGradient(double[][] grayscaled) {
       double maxG = Double.NEGATIVE_INFINITY;
