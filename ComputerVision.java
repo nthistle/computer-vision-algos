@@ -196,9 +196,15 @@ public class ComputerVision
       int[][] thresholded = new int[edges.length][edges[0].length];
       for(int i = 0; i < edges.length; i ++) {
          for(int j = 0; j < edges.length; j ++) {
-         
+            if(edges[i][j] > strongThresh)
+               thresholded[i][j] = 2;
+            else if(edges[i][j] > weakThresh)
+               thresholded[i][j] = 1;
+            else
+               thresholded[i][j] = 0;
          }
       }
+      return thresholded;
    }
    
    public static double[][] nonmaxsuppression(double[][][] rawSobel) {
