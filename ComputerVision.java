@@ -189,12 +189,24 @@ public class ComputerVision
       return bestThreshold;
    }
    
-   public static int[][] blobAnalysis(int[][] thresholded) {
+   // TODO: add blobanalysis and thresholding edges to the main
+   
+   // TODO: look at histograms of suppressed edges (see if can apply something like Otsu)
+   
+   public static boolean[][] blobAnalysis(int[][] thresholded) {
       // keeps weak edges only if adjacent to strong edge
-      int[][] edges = new int[thresholded.length][thresholded[0].length];
+      boolean[][] edges = new boolean[thresholded.length][thresholded[0].length];
       for(int i = 0; i < thresholded.length; i ++) {
-         for(int j = 0; j < thresholded[0].length[j]) {
-         
+         for(int j = 0; j < thresholded[0].length; j ++) {
+            edges[i][j] = false;
+            if(thresholded[i][j] == 2) {
+               edges[i][j] = true;
+            } else if(thresholded[i][j] == 1) {
+               if(i > 0 && thresholded[i-1][j] == 2) edges[i][j] = true;
+               else if(j > 0 && thresholded[i][j-1] == 2) edges[i][j] = true;
+               else if(i < thresholded.length-1 && thresholded[i+1][j] == 2) edges[i][j] = true;
+               else if(j < thresholded[0].length-1 && thresholded[i][j+1] == 2) edges[i][j] = true;
+            }
          }
       }
       return edges;
