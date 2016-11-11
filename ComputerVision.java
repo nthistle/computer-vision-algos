@@ -189,13 +189,24 @@ public class ComputerVision
       return bestThreshold;
    }
    
+   public static int[][] blobAnalysis(int[][] thresholded) {
+      // keeps weak edges only if adjacent to strong edge
+      int[][] edges = new int[thresholded.length][thresholded[0].length];
+      for(int i = 0; i < thresholded.length; i ++) {
+         for(int j = 0; j < thresholded[0].length[j]) {
+         
+         }
+      }
+      return edges;
+   }
+   
    public static int[][] thresholdedges(double[][] edges, double strongThresh, double weakThresh) {
       // 0 = none
       // 1 = weak
       // 2 = strong
       int[][] thresholded = new int[edges.length][edges[0].length];
       for(int i = 0; i < edges.length; i ++) {
-         for(int j = 0; j < edges.length; j ++) {
+         for(int j = 0; j < edges[0].length; j ++) {
             if(edges[i][j] > strongThresh)
                thresholded[i][j] = 2;
             else if(edges[i][j] > weakThresh)
