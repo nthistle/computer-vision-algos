@@ -61,6 +61,10 @@ public class ComputerVision
          writeImage(sobelImage, WORKING_DIR + base_name + "_sobel.png");
          BufferedImage thinImage = grayToImage(normalize(thinned));
          writeImage(thinImage, WORKING_DIR + base_name + "_sobel_thin.png");
+         int[] edgeHist = getHistogram(thinned, BIN_SIZE);
+         for(int i : edgeHist) System.out.println(i);
+         // TODO analyze this
+         // int[][] thresholded = thresholdedges(thinned, 0.25, 0.5);
       
       } else if(choice == 2) {
          System.out.println("Calculating Histogram...");
