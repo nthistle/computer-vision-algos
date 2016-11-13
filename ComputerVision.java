@@ -109,10 +109,10 @@ public class ComputerVision
                setColor(histImg, i, j, new Color(gval, gval, gval));
             }
             else if((hist.length-j) > scaledHist[i]) {
-               setColor(histImg, i, j, new Color(255, 0, 0));
+               setColor(histImg, i, j, new Color(255, 255, 255));
             }
             else {
-               setColor(histImg, i, j, new Color(255, 255, 255));
+               setColor(histImg, i, j, new Color(255, 0, 0));
             }
          }
       }
