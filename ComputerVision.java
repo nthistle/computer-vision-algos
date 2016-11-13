@@ -62,13 +62,23 @@ public class ComputerVision
          BufferedImage thinImage = grayToImage(normalize(thinned));
          writeImage(thinImage, WORKING_DIR + base_name + "_sobel_thin.png");
          int[] edgeHist = getHistogram(thinned, BIN_SIZE);
-         for(int i : edgeHist) System.out.println(i);
+         
+         
+         //BufferedImage histImage = histToImage(edgeHist);
+         //writeImage(histImage, WORKING_DIR + base_name + "_edge_histogram.png");
+         
+         
+         //for(int i : edgeHist) System.out.println(i);
          // TODO analyze this
          // int[][] thresholded = thresholdedges(thinned, 0.25, 0.5);
       
       } else if(choice == 2) {
          System.out.println("Calculating Histogram...");
          int[] hist = getHistogram(gray, BIN_SIZE);
+         
+         BufferedImage histImage = histToImage(hist);
+         writeImage(histImage, WORKING_DIR + base_name + "_gray_histogram.png");
+         
          System.out.println("Using Otsu Thresholding...");
          int threshold = otsuThreshold(hist);
          System.out.println("Found Threshold Value of " + threshold); // will already be in [0,255] range
@@ -78,6 +88,36 @@ public class ComputerVision
          BufferedImage binaryImage = grayToImage(binary);
          writeImage(binaryImage, WORKING_DIR + base_name + "_binary.png");
       }
+   }
+   
+   public static BufferedImage histToImage(int[] hist) {
+      BufferedImage histImg = new BufferedImage(hist.length, hist.length+15, BufferedImage.TYPE_INT_ARGB);
+      // scale to max of hist.length
+      double[] scaledHist = new double[hist.length];
+      int maxFreq = 0;
+      for(int i = 0; i < hist.length; i ++) {
+         if(hist[i] > maxFreq) maxFreq = hist[i];
+      }
+      for(int i = 0; i < hist.length; i ++) {
+         scaledHist[i] = hist.length * hist[i] / ((double)maxFreq);
+      }
+      int gval;
+      for(int i = 0; i < hist.length; i ++) {
+         for(int j = 0; j < hist.length+15; j ++) {
+            if(j >= hist.length) {
+               gval = (int)((255.0*i)/(double)hist.length);
+               setColor(histImg, i, j, new Color(gval, gval, gval));
+            }
+            else if((hist.length-j) > scaledHist[i]) {
+               setColor(histImg, i, j, new Color(255, 0, 0));
+            }
+            else {
+               setColor(histImg, i, j, new Color(255, 255, 255));
+            }
+         }
+      }
+      
+      return histImg;
    }
    
    public static double[][] invert(double[][] gray) {
