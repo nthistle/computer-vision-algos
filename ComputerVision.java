@@ -79,11 +79,14 @@ public class ComputerVision
          System.out.println("Calculating Histogram...");
          int[] hist = getHistogram(gray, BIN_SIZE);
          
-         BufferedImage histImage = histToImage(hist);
-         writeImage(histImage, WORKING_DIR + base_name + "_gray_histogram.png");
          
          System.out.println("Using Otsu Thresholding...");
          int threshold = otsuThreshold(hist);
+         
+         System.out.println("Drawing histogram...");
+         
+         BufferedImage histImage = histToImage(hist, threshold);
+         writeImage(histImage, WORKING_DIR + base_name + "_gray_histogram.png");
          
          System.out.println("Found Threshold Value of " + threshold); // will already be in [0,255] range
          System.out.println("Binarizing Image with Determined Threshold...");
