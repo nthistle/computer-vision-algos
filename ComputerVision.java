@@ -56,13 +56,16 @@ public class ComputerVision
          double[][][] rawSobelIntensity = sobelRaw(current);
          System.out.println("Applying Non-maximum suppression...");
          double[][] thinned = nonmaxsuppression(rawSobelIntensity);
+         double[][] normalThin = normalize(thinned);
          System.out.println("Converting to image and writing...");
          BufferedImage sobelImage = grayToImage(normalize(sobelRawToParsed(rawSobelIntensity)));
          writeImage(sobelImage, WORKING_DIR + base_name + "_sobel.png");
-         BufferedImage thinImage = grayToImage(normalize(thinned));
+         BufferedImage thinImage = grayToImage(normalThin);
          writeImage(thinImage, WORKING_DIR + base_name + "_sobel_thin.png");
-         int[] edgeHist = getHistogram(thinned, BIN_SIZE);
          
+         //int[] edgeHist = getHistogram(normalThin, BIN_SIZE);
+         
+         //edgeHist[0] = 0; // otherwise it counts everything that's not an edge
          
          //BufferedImage histImage = histToImage(edgeHist);
          //writeImage(histImage, WORKING_DIR + base_name + "_edge_histogram.png");
@@ -81,6 +84,7 @@ public class ComputerVision
          
          System.out.println("Using Otsu Thresholding...");
          int threshold = otsuThreshold(hist);
+         
          System.out.println("Found Threshold Value of " + threshold); // will already be in [0,255] range
          System.out.println("Binarizing Image with Determined Threshold...");
          double[][] binary = binarize(gray, ((double)threshold)/BIN_SIZE);
@@ -89,6 +93,40 @@ public class ComputerVision
          writeImage(binaryImage, WORKING_DIR + base_name + "_binary.png");
       }
    }
+   
+   
+   public static BufferedImage histToImage(int[] hist, int breakpoint) {
+      BufferedImage histImg = new BufferedImage(hist.length, hist.length+15, BufferedImage.TYPE_INT_ARGB);
+      // scale to max of hist.length
+      double[] scaledHist = new double[hist.length];
+      int maxFreq = 0;
+      for(int i = 0; i < hist.length; i ++) {
+         if(hist[i] > maxFreq) maxFreq = hist[i];
+      }
+      for(int i = 0; i < hist.length; i ++) {
+         scaledHist[i] = hist.length * hist[i] / ((double)maxFreq);
+      }
+      int gval;
+      for(int i = 0; i < hist.length; i ++) {
+         for(int j = 0; j < hist.length+15; j ++) {
+            if(j >= hist.length) {
+               gval = (int)((255.0*i)/(double)hist.length);
+               setColor(histImg, i, j, new Color(gval, gval, gval));
+            }
+            else if(i == breakpoint) {
+               setColor(histImg, i, j, new Color(0, 0, 0));
+            }
+            else if((hist.length-j) > scaledHist[i]) {
+               setColor(histImg, i, j, new Color(255, 255, 255));
+            }
+            else {
+               setColor(histImg, i, j, new Color(255, 0, 0));
+            }
+         }
+      }
+      return histImg;
+   }
+
    
    public static BufferedImage histToImage(int[] hist) {
       BufferedImage histImg = new BufferedImage(hist.length, hist.length+15, BufferedImage.TYPE_INT_ARGB);
@@ -116,7 +154,6 @@ public class ComputerVision
             }
          }
       }
-      
       return histImg;
    }
    
