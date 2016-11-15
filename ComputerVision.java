@@ -15,13 +15,91 @@ import java.lang.Math;
 public class ComputerVision
 {
 
-   public static final String WORKING_DIR = "../images/";
-   public static final int NUM_GAUSS = 0; // make this an input
+   //public static final String WORKING_DIR = "../images/";
+   //public static final int NUM_GAUSS = 0; // make this an input
    public static final int BIN_SIZE = 256; // decimal grayscaled means this could be higher
    
    public static void main(String[] args) {
-      // TODO: make filename and what to do to image command-line arguments
-      int NUM_GAUSS = 0;
+      // usage:  java ComputerVision [edge|binarize] [filename]
+      String command = args[0];
+      if(command.equalsIgnoreCase("edgedetect") || command.equalsIgnoreCase("edge")) {
+         doEdgeDetect(args);
+      }
+      else if(command.equalsIgnoreCase("binarize") || command.equalsIgnoreCase("bin")) {
+         doBinarize(args);
+      }
+   }
+   
+   public static void doBinarize(String[] args) {
+   
+      int pos = args[1].lastIndexOf(".");
+      String base_name = args[1].substring(0,pos);
+   
+      System.out.println("Reading image...");
+      BufferedImage testImage = readImage(args[1]);
+      System.out.println("Grayscaling...");
+      double[][] gray = grayscale(testImage);
+      
+      System.out.println("Converting to image and writing...");
+      BufferedImage grayImage = grayToImage(gray);
+      writeImage(grayImage,base_name + "_gray.png");
+   
+      System.out.println("Calculating Histogram...");
+      int[] hist = getHistogram(gray, BIN_SIZE);
+         
+      System.out.println("Using Otsu Thresholding...");
+      int threshold = otsuThreshold(hist);
+         
+      System.out.println("Drawing histogram...");
+       
+      BufferedImage histImage = histToImage(hist, threshold);
+      writeImage(histImage, base_name + "_gray_histogram.png");
+         
+      System.out.println("Found Threshold Value of " + threshold); // will already be in [0,255] range
+      System.out.println("Binarizing Image with Determined Threshold...");
+      double[][] binary = binarize(gray, ((double)threshold)/BIN_SIZE);
+      System.out.println("Converting to image and writing...");
+      BufferedImage binaryImage = grayToImage(binary);
+      writeImage(binaryImage, base_name + "_binary.png");
+      
+   }
+   
+   public static void doEdgeDetect(String[] args) {
+      int NUM_GAUSS = (args.length > 2)?Integer.parseInt(args[2]):0;
+      
+      int pos = args[1].lastIndexOf(".");
+      String base_name = args[1].substring(0,pos);
+   
+      System.out.println("Reading image...");
+      BufferedImage testImage = readImage(args[1]);
+      System.out.println("Grayscaling...");
+      double[][] gray = grayscale(testImage);
+      
+      System.out.println("Converting to image and writing...");
+      BufferedImage grayImage = grayToImage(gray);
+      writeImage(grayImage,base_name + "_gray.png");
+
+      double[][] current = gray;
+      if(NUM_GAUSS>0) {
+         System.out.println("Applying Gaussian Blur...");
+         for(int i = 0; i < NUM_GAUSS; i ++) {
+            current = gaussian(current);
+         }
+      }
+      
+      System.out.println("Applying Sobel...");
+      double[][][] rawSobelIntensity = sobelRaw(current);
+      System.out.println("Applying Non-maximum suppression...");
+      double[][] thinned = nonmaxsuppression(rawSobelIntensity);
+      double[][] normalThin = normalize(thinned);
+      System.out.println("Converting to image and writing...");
+      BufferedImage sobelImage = grayToImage(normalize(sobelRawToParsed(rawSobelIntensity)));
+      writeImage(sobelImage, base_name + "_sobel.png");
+      BufferedImage thinImage = grayToImage(normalThin);
+      writeImage(thinImage, base_name + "_sobel_thin.png");
+   }
+   
+      /*int NUM_GAUSS = 0;
       Scanner sc = new Scanner(System.in);
       System.out.println("Filename: ");
       String image_name = sc.nextLine();
@@ -29,9 +107,13 @@ public class ComputerVision
       String base_name = image_name.substring(0,pos);
       
       System.out.println("Reading image...");
-      BufferedImage testImage = readImage(WORKING_DIR + image_name);
+      BufferedImage testImage = readImage(image_name);
       System.out.println("Grayscaling...");
       double[][] gray = grayscale(testImage);
+      
+      System.out.println("Converting to image and writing...");
+      BufferedImage grayImage = grayToImage(gray);
+      writeImage(grayImage,base_name + "_gray.png");
       
       System.out.println("Choose option: ");
       System.out.println("1 - Sobel (and Non-max suppression)");
@@ -39,10 +121,6 @@ public class ComputerVision
       int choice = sc.nextInt();
       
       if(choice == 1) {
-      
-         System.out.println("Converting to image and writing...");
-         BufferedImage grayImage = grayToImage(gray);
-         writeImage(grayImage,WORKING_DIR + base_name + "_gray.png");
       
          double[][] current = gray;
          if(NUM_GAUSS>0) {
@@ -59,16 +137,16 @@ public class ComputerVision
          double[][] normalThin = normalize(thinned);
          System.out.println("Converting to image and writing...");
          BufferedImage sobelImage = grayToImage(normalize(sobelRawToParsed(rawSobelIntensity)));
-         writeImage(sobelImage, WORKING_DIR + base_name + "_sobel.png");
+         writeImage(sobelImage, base_name + "_sobel.png");
          BufferedImage thinImage = grayToImage(normalThin);
-         writeImage(thinImage, WORKING_DIR + base_name + "_sobel_thin.png");
+         writeImage(thinImage, base_name + "_sobel_thin.png");
          
          //int[] edgeHist = getHistogram(normalThin, BIN_SIZE);
          
          //edgeHist[0] = 0; // otherwise it counts everything that's not an edge
          
          //BufferedImage histImage = histToImage(edgeHist);
-         //writeImage(histImage, WORKING_DIR + base_name + "_edge_histogram.png");
+         //writeImage(histImage, base_name + "_edge_histogram.png");
          
          
          //for(int i : edgeHist) System.out.println(i);
@@ -86,16 +164,16 @@ public class ComputerVision
          System.out.println("Drawing histogram...");
          
          BufferedImage histImage = histToImage(hist, threshold);
-         writeImage(histImage, WORKING_DIR + base_name + "_gray_histogram.png");
+         writeImage(histImage, base_name + "_gray_histogram.png");
          
          System.out.println("Found Threshold Value of " + threshold); // will already be in [0,255] range
          System.out.println("Binarizing Image with Determined Threshold...");
          double[][] binary = binarize(gray, ((double)threshold)/BIN_SIZE);
          System.out.println("Converting to image and writing...");
          BufferedImage binaryImage = grayToImage(binary);
-         writeImage(binaryImage, WORKING_DIR + base_name + "_binary.png");
-      }
-   }
+         writeImage(binaryImage, base_name + "_binary.png");
+      }*/
+   //}
    
    
    public static BufferedImage histToImage(int[] hist, int breakpoint) {
