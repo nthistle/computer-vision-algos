@@ -97,6 +97,9 @@ public class ComputerVision
       writeImage(sobelImage, base_name + "_sobel.png");
       BufferedImage thinImage = grayToImage(normalThin);
       writeImage(thinImage, base_name + "_sobel_thin.png");
+      
+      int[][] thresholded = thresholdedges(thinned, 0.25, 0.5);
+      // 
    }
    
       /*int NUM_GAUSS = 0;
