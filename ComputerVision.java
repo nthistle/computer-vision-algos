@@ -377,6 +377,15 @@ public class ComputerVision
       return edges;
    }
    
+   public static BufferedImage booleanToImage(boolean[][] thresholded) {
+      BufferedImage img = new BufferedImage(thresholded.length, thresholded[0].length, BufferedImage.TYPE_INT_ARGB);
+      for(int x = 0; x < thresholded.length; x ++) {
+         for(int y = 0; y < thresholded[0].length; y ++) {
+         }
+      }
+      return img;
+   }
+   
    public static int[][] thresholdedges(double[][] edges, double strongThresh, double weakThresh) {
       // 0 = none
       // 1 = weak
