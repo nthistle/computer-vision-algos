@@ -99,6 +99,9 @@ public class ComputerVision
       writeImage(thinImage, base_name + "_sobel_thin.png");
       
       int[][] thresholded = thresholdedges(thinned, 0.25, 0.5);
+      boolean[][] blobbed = blobAnalysis(thresholded);
+      BufferedImage edgeImage = booleanToImage(blobbed);
+      writeImage(edgeImage, base_name + "_finaledges.png");
       // 
    }
    
