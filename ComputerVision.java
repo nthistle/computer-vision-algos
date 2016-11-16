@@ -381,6 +381,10 @@ public class ComputerVision
       BufferedImage img = new BufferedImage(thresholded.length, thresholded[0].length, BufferedImage.TYPE_INT_ARGB);
       for(int x = 0; x < thresholded.length; x ++) {
          for(int y = 0; y < thresholded[0].length; y ++) {
+            if(thresholded[x][y])
+               setColor(img, x, y, new Color(255,255,255));
+            else
+               setColor(img, x, y, new Color(0,0,0));
          }
       }
       return img;
