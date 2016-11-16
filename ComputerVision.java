@@ -98,11 +98,13 @@ public class ComputerVision
       BufferedImage thinImage = grayToImage(normalThin);
       writeImage(thinImage, base_name + "_sobel_thin.png");
       
+      System.out.println("Thresholding edges...");
       int[][] thresholded = thresholdedges(thinned, 0.25, 0.5);
+      System.out.println("Applying Blob Analysis...");
       boolean[][] blobbed = blobAnalysis(thresholded);
+      System.out.println("Converting to image and writing...");
       BufferedImage edgeImage = booleanToImage(blobbed);
       writeImage(edgeImage, base_name + "_finaledges.png");
-      // 
    }
    
       /*int NUM_GAUSS = 0;
