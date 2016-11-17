@@ -15,12 +15,13 @@ import java.lang.Math;
 public class ComputerVision
 {
 
-   //public static final String WORKING_DIR = "../images/";
-   //public static final int NUM_GAUSS = 0; // make this an input
    public static final int BIN_SIZE = 256; // decimal grayscaled means this could be higher
    
    public static void main(String[] args) {
-      // usage:  java ComputerVision [edge|binarize] [filename]
+      if(args.length < 2) {
+         System.out.println("usage: java ComputerVision {edge|bin} image_name [gaussian_level]");
+         System.exit(-1);
+      }
       String command = args[0];
       if(command.equalsIgnoreCase("edgedetect") || command.equalsIgnoreCase("edge")) {
          doEdgeDetect(args);
@@ -106,82 +107,6 @@ public class ComputerVision
       BufferedImage edgeImage = booleanToImage(blobbed);
       writeImage(edgeImage, base_name + "_finaledges.png");
    }
-   
-      /*int NUM_GAUSS = 0;
-      Scanner sc = new Scanner(System.in);
-      System.out.println("Filename: ");
-      String image_name = sc.nextLine();
-      int pos = image_name.lastIndexOf(".");
-      String base_name = image_name.substring(0,pos);
-      
-      System.out.println("Reading image...");
-      BufferedImage testImage = readImage(image_name);
-      System.out.println("Grayscaling...");
-      double[][] gray = grayscale(testImage);
-      
-      System.out.println("Converting to image and writing...");
-      BufferedImage grayImage = grayToImage(gray);
-      writeImage(grayImage,base_name + "_gray.png");
-      
-      System.out.println("Choose option: ");
-      System.out.println("1 - Sobel (and Non-max suppression)");
-      System.out.println("2 - Otsu Threshold Binarize");
-      int choice = sc.nextInt();
-      
-      if(choice == 1) {
-      
-         double[][] current = gray;
-         if(NUM_GAUSS>0) {
-            System.out.println("Applying Gaussian Blur...");
-            for(int i = 0; i < NUM_GAUSS; i ++) {
-               current = gaussian(current);
-            }
-         }
-      
-         System.out.println("Applying Sobel...");
-         double[][][] rawSobelIntensity = sobelRaw(current);
-         System.out.println("Applying Non-maximum suppression...");
-         double[][] thinned = nonmaxsuppression(rawSobelIntensity);
-         double[][] normalThin = normalize(thinned);
-         System.out.println("Converting to image and writing...");
-         BufferedImage sobelImage = grayToImage(normalize(sobelRawToParsed(rawSobelIntensity)));
-         writeImage(sobelImage, base_name + "_sobel.png");
-         BufferedImage thinImage = grayToImage(normalThin);
-         writeImage(thinImage, base_name + "_sobel_thin.png");
-         
-         //int[] edgeHist = getHistogram(normalThin, BIN_SIZE);
-         
-         //edgeHist[0] = 0; // otherwise it counts everything that's not an edge
-         
-         //BufferedImage histImage = histToImage(edgeHist);
-         //writeImage(histImage, base_name + "_edge_histogram.png");
-         
-         
-         //for(int i : edgeHist) System.out.println(i);
-         // TODO analyze this
-         // int[][] thresholded = thresholdedges(thinned, 0.25, 0.5);
-      
-      } else if(choice == 2) {
-         System.out.println("Calculating Histogram...");
-         int[] hist = getHistogram(gray, BIN_SIZE);
-         
-         
-         System.out.println("Using Otsu Thresholding...");
-         int threshold = otsuThreshold(hist);
-         
-         System.out.println("Drawing histogram...");
-         
-         BufferedImage histImage = histToImage(hist, threshold);
-         writeImage(histImage, base_name + "_gray_histogram.png");
-         
-         System.out.println("Found Threshold Value of " + threshold); // will already be in [0,255] range
-         System.out.println("Binarizing Image with Determined Threshold...");
-         double[][] binary = binarize(gray, ((double)threshold)/BIN_SIZE);
-         System.out.println("Converting to image and writing...");
-         BufferedImage binaryImage = grayToImage(binary);
-         writeImage(binaryImage, base_name + "_binary.png");
-      }*/
-   //}
    
    
    public static BufferedImage histToImage(int[] hist, int breakpoint) {
@@ -359,9 +284,6 @@ public class ComputerVision
       return bestThreshold;
    }
    
-   // TODO: add blobanalysis and thresholding edges to the main
-   
-   // TODO: look at histograms of suppressed edges (see if can apply something like Otsu)
    
    public static boolean[][] blobAnalysis(int[][] thresholded) {
       // keeps weak edges only if adjacent to strong edge
