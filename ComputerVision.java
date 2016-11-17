@@ -108,7 +108,15 @@ public class ComputerVision
       writeImage(edgeImage, base_name + "_finaledges.png");
    }
    
-   
+  /**
+   * Converts a histogram in the format of an array of frequencies 
+   * into an image for easier user analysis, and draws a breakpoint
+   * line, useful for analyzing accuracy of threshold choices.
+   *
+   * @param  hist        histogram stored as integer array of frequencies
+   * @param  breakpoint  which bin of the histogram to draw the break line at
+   * @return             BufferedImage with visual representation of histogram
+   */
    public static BufferedImage histToImage(int[] hist, int breakpoint) {
       BufferedImage histImg = new BufferedImage(hist.length, hist.length+15, BufferedImage.TYPE_INT_ARGB);
       // scale to max of hist.length
@@ -141,7 +149,13 @@ public class ComputerVision
       return histImg;
    }
 
-   
+  /**
+   * Converts a histogram in the format of an array of frequencies 
+   * into an image for easier user analysis.
+   *
+   * @param  hist        histogram stored as integer array of frequencies
+   * @return             BufferedImage with visual representation of histogram
+   */
    public static BufferedImage histToImage(int[] hist) {
       BufferedImage histImg = new BufferedImage(hist.length, hist.length+15, BufferedImage.TYPE_INT_ARGB);
       // scale to max of hist.length
@@ -171,14 +185,21 @@ public class ComputerVision
       return histImg;
    }
    
-   public static double[][] invert(double[][] gray) {
-      double[][] grad = new double[gray.length][gray[0].length];
-      for(int x = 0; x < gray.length; x ++) {
-         for(int y = 0; y < gray[0].length; y ++) {
-            grad[x][y] = 1-gray[x][y];
+  /**
+   * Inverts an image represented as a double 2D array, assuming
+   * values in range [0,1] in input.
+   *
+   * @param  img         2D double array of values representing image, in range [0,1]
+   * @return             inverted representation of image in 2D double array
+   */
+   public static double[][] invert(double[][] img) {
+      double[][] inv = new double[img.length][img[0].length];
+      for(int x = 0; x < img.length; x ++) {
+         for(int y = 0; y < img[0].length; y ++) {
+            inv[x][y] = 1.0 - img[x][y];
          }
       }
-      return grad;
+      return inv;
    }
    
    public static double[][] sobelRawToParsed(double[][][] rawSobel) {
