@@ -202,6 +202,14 @@ public class ComputerVision
       return inv;
    }
    
+  /**
+   * Turns a "raw" matrix of Sobel directional gradients (Gx and Gy) into
+   * a cleaner representation of the total gradient, sqrt(Gx^2+Gy^2), which
+   * can directly be turned into a grayscale image.
+   *
+   * @param  rawSobel    3D double array of values representing sobel gradients (last index being Gx, Gy)
+   * @return             cleaner representation of the total gradient
+   */
    public static double[][] sobelRawToParsed(double[][][] rawSobel) {
       double[][] gvals = new double[rawSobel.length][rawSobel[0].length];
       for(int i = 0; i < rawSobel.length; i ++) {
@@ -212,6 +220,13 @@ public class ComputerVision
       return gvals;
    }
    
+  /**
+   * Normalizes all the values in a given double array into the range [0,1],
+   * which is then more readily turned into an image with the other methods.
+   *
+   * @param  raw         2D double array of values in any range
+   * @return             normalized 2D double array to range [0,1]
+   */
    public static double[][] normalize(double[][] raw) {
       double minval = Double.POSITIVE_INFINITY;
       double maxval = Double.NEGATIVE_INFINITY;
