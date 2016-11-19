@@ -29,6 +29,40 @@ public class ComputerVision
       else if(command.equalsIgnoreCase("binarize") || command.equalsIgnoreCase("bin")) {
          doBinarize(args);
       }
+      else if(command.equalsIgnoreCase("dog")) {
+         differenceOfGaussians(args);
+      }
+   }
+   
+   public static void differenceOfGaussians(String[] args) {
+      int NUM_GAUSS = (args.length > 2)?Integer.parseInt(args[2]):3;
+   
+      int pos = args[1].lastIndexOf(".");
+      String base_name = args[1].substring(0,pos);
+   
+      System.out.println("Reading image...");
+      BufferedImage testImage = readImage(args[1]);
+      System.out.println("Grayscaling...");
+      double[][] gray = grayscale(testImage);
+      
+      System.out.println("Converting to image and writing...");
+      BufferedImage grayImage = grayToImage(gray);
+      writeImage(grayImage,base_name + "_gray.png");
+   
+      double[][] current = cloneArr(gray);
+      if(NUM_GAUSS>0) {
+         System.out.println("Applying Gaussian Blur...");
+         for(int i = 0; i < NUM_GAUSS; i ++) {
+            current = gaussian(current);
+         }
+      }
+      System.out.println("Subtracting...");
+      double[][] dog = difference(current, gray);
+      double[][] normalizedDog = normalize(dog);
+            
+      System.out.println("Converting to image and writing...");
+      BufferedImage dogImage = grayToImage(normalizedDog);
+      writeImage(dogImage, base_name + "_difference_of_gauss.png");
    }
    
    public static void doBinarize(String[] args) {
@@ -249,6 +283,26 @@ public class ComputerVision
          }
       }
       return normalized;
+   }
+   
+   public static double[][] difference(double[][] m1, double[][] m2) {
+      double[][] diff = new double[m1.length][m1[0].length];
+      for(int i = 0; i < m1.length; i ++) {
+         for(int j = 0; j < m1[0].length; j ++) {
+            diff[i][j] = m1[i][j] - m2[i][j];
+         }      
+      }
+      return diff;
+   }
+   
+   public static double[][] cloneArr(double[][] m1) {
+      double[][] clone = new double[m1.length][m1[0].length];
+      for(int i = 0; i < m1.length; i ++) {
+         for(int j = 0; j < m1[0].length; j ++) {
+            clone[i][j] = m1[i][j];
+         }      
+      }
+      return clone;
    }
    
   /**
