@@ -100,12 +100,18 @@ public class ComputerVision
       writeImage(thinImage, base_name + "_sobel_thin.png");
       
       System.out.println("Thresholding edges...");
-      int[][] thresholded = thresholdedges(thinned, 0.4, 0.7); // requires tweaking
+      int[][] thresholded = thresholdedges(normalThin, 0.4, 0.7); // requires tweaking
       System.out.println("Applying Blob Analysis...");
       boolean[][] blobbed = blobAnalysis(thresholded);
       System.out.println("Converting to image and writing...");
       BufferedImage edgeImage = booleanToImage(blobbed);
       writeImage(edgeImage, base_name + "_finaledges.png");
+      
+      //int[] histEdges = getHistogram(normalThin);
+      //int chosenThresh = otsuThreshold(histEdges);
+      //writeImage(histToImage(histEdges, chosenThresh), base_name + "_edgeshist.png");
+      //for(int i : histEdges) System.out.println(i);
+      //System.out.println("Thresh: " + chosenThresh);
    }
    
   /**
@@ -350,6 +356,13 @@ public class ComputerVision
    }
    
    
+  /**
+   * Turns a representation of "strong" and "weak" edges into a regular representation
+   * of edges by only keeping strong edges and weak edges adjacent to strong edges
+   *
+   * @param  thresholded 2D integer array representation of "strong" and "weak" edges
+   * @return             "blob analyzed" boolean area with determined edges
+   */
    public static boolean[][] blobAnalysis(int[][] thresholded) {
       // keeps weak edges only if adjacent to strong edge
       boolean[][] edges = new boolean[thresholded.length][thresholded[0].length];
