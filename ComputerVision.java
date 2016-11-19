@@ -245,10 +245,26 @@ public class ComputerVision
       return normalized;
    }
    
+  /**
+   * Returns a histogram of the supplied grayscaled image data, into a default
+   * of 256 bins
+   *
+   * @param  img         2D double array of values to be used in histogram
+   * @return             int array of histogram representing frequencies of value ranges
+   */
    public static int[] getHistogram(double[][] img) {
       return getHistogram(img, 256);
    }
    
+   
+  /**
+   * Returns a histogram of the supplied grayscaled image data, into the number
+   * of supplied bins
+   *
+   * @param  img         2D double array of values to be used in histogram
+   * @param  bins        number of "bins" to group data into
+   * @return             int array of length bins of histogram representing frequencies of value ranges
+   */
    public static int[] getHistogram(double[][] img, int bins) {
       int[] binned = new int[bins];
       // assuming img is in range from [0,1]
@@ -260,6 +276,14 @@ public class ComputerVision
       return binned;
    }
    
+  /**
+   * Binarizes a supplied double array (image representation) according to supplied
+   * threshold, values below threshold become 0, values above become 1
+   *
+   * @param  grayscale   2D double array representing grayscaled image (preferably in range [0,1])
+   * @param  threshold   threshold on which to binarize supplied data
+   * @return             binarized 2D double array with values 0 and 1
+   */
    public static double[][] binarize(double[][] grayscale, double threshold) {
       double[][] binaryimg = new double[grayscale.length][grayscale[0].length];
       for(int i = 0; i < grayscale.length; i ++) {
@@ -274,9 +298,14 @@ public class ComputerVision
    }
    
    
-   /**
-    * heavily based off of http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html
-    */
+  /**
+   * Analyzes a histogram and returns a threshold that maximizes between-class variance
+   * (also minimizing within class variance)
+   * heavily based off of http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html    
+   * 
+   * @param  histogram   integer array representing frequencies in corresponding bins
+   * @return             ideal threshold value (bin #) to divide data to maximize between-class variance
+   */
    public static int otsuThreshold(int[] histogram) {
       double sum = 0.0;
       int total = 0;
