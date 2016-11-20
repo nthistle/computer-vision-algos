@@ -134,7 +134,7 @@ public class ComputerVision
       writeImage(thinImage, base_name + "_sobel_thin.png");
       
       System.out.println("Thresholding edges...");
-      int[][] thresholded = thresholdedges(normalThin, 0.4, 0.7); // requires tweaking
+      int[][] thresholded = thresholdedges(normalThin, 0.15, 0.25); // requires tweaking
       System.out.println("Applying Blob Analysis...");
       boolean[][] blobbed = blobAnalysis(thresholded);
       System.out.println("Converting to image and writing...");
@@ -419,21 +419,88 @@ public class ComputerVision
    */
    public static boolean[][] blobAnalysis(int[][] thresholded) {
       // keeps weak edges only if adjacent to strong edge
-      boolean[][] edges = new boolean[thresholded.length][thresholded[0].length];
+      int[][] edgesA = new int[thresholded.length][thresholded[0].length];
       for(int i = 0; i < thresholded.length; i ++) {
          for(int j = 0; j < thresholded[0].length; j ++) {
-            edges[i][j] = false;
-            if(thresholded[i][j] == 2) {
-               edges[i][j] = true;
-            } else if(thresholded[i][j] == 1) {
-               if(i > 0 && thresholded[i-1][j] == 2) edges[i][j] = true;
-               else if(j > 0 && thresholded[i][j-1] == 2) edges[i][j] = true;
-               else if(i < thresholded.length-1 && thresholded[i+1][j] == 2) edges[i][j] = true;
-               else if(j < thresholded[0].length-1 && thresholded[i][j+1] == 2) edges[i][j] = true;
-            }
+            edgesA[i][j] = thresholded[i][j];
          }
       }
-      return edges;
+      boolean[][] visitedMap = new boolean[edgesA.length][edgesA[0].length];
+      boolean[][] edgesFinal = new boolean[edgesA.length][edgesA[0].length];
+      for(int i = 0; i < edgesA.length; i ++) {
+         for(int j = 0; j < edgesA[0].length; j ++) {
+            if(edgesA[i][j] == 1)
+               connectToStrong(edgesA, visitedMap, i, j);
+            if(edgesA[i][j] == 2)
+               edgesFinal[i][j] = true;
+         }
+      }
+      return edgesFinal;
+   }
+   
+   private static boolean connectToStrong(int[][] map, boolean[][] visited, int a, int b) {
+      if(map[a][b] == 2) return true;
+      visited[a][b] = true;
+      if(a > 0 && map[a-1][b] != 0 && !visited[a-1][b]) {
+         if(connectToStrong(map, visited, a-1, b)) {
+            visited[a][b] = false;
+            map[a][b] = 2;
+            return true;
+         }
+      }
+      if(b > 0 && map[a][b-1] != 0 && !visited[a][b-1]) {
+         if(connectToStrong(map, visited, a, b-1)) {
+            visited[a][b] = false;
+            map[a][b] = 2;
+            return true;
+         }
+      }
+      if(a < map.length-1 && map[a+1][b] != 0 && !visited[a+1][b]) {
+         if(connectToStrong(map, visited, a+1, b)) {
+            visited[a][b] = false;
+            map[a][b] = 2;
+            return true;
+         }
+      }
+      if(b < map[0].length-1 && map[a][b+1] != 0 && !visited[a][b+1]) {
+         if(connectToStrong(map, visited, a, b+1)) {
+            visited[a][b] = false;
+            map[a][b] = 2;
+            return true;
+         }
+      }
+      
+      
+      if(a > 0 && b > 0 && map[a-1][b-1] != 0 && !visited[a-1][b-1]) {
+         if(connectToStrong(map, visited, a-1, b-1)) {
+            visited[a][b] = false;
+            map[a][b] = 2;
+            return true;
+         }
+      }
+      if(a < map.length-1 && b > 0 && map[a+1][b-1] != 0 && !visited[a+1][b-1]) {
+         if(connectToStrong(map, visited, a+1, b-1)) {
+            visited[a][b] = false;
+            map[a][b] = 2;
+            return true;
+         }
+      }
+      if(a > 0 && b < map[0].length-1 && map[a-1][b+1] != 0 && !visited[a-1][b+1]) {
+         if(connectToStrong(map, visited, a-1, b+1)) {
+            visited[a][b] = false;
+            map[a][b] = 2;
+            return true;
+         }
+      }
+
+      if(a < map.length-1 && b < map[0].length-1 && map[a+1][b+1] != 0 && !visited[a+1][b+1]) {
+         if(connectToStrong(map, visited, a+1, b+1)) {
+            visited[a][b] = false;
+            map[a][b] = 2;
+            return true;
+         }
+      }
+      return false;
    }
    
    public static BufferedImage booleanToImage(boolean[][] thresholded) {
