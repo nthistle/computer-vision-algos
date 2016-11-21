@@ -134,7 +134,10 @@ public class ComputerVision
       writeImage(thinImage, base_name + "_sobel_thin.png");
       
       System.out.println("Thresholding edges...");
-      int[][] thresholded = thresholdedges(normalThin, 0.15, 0.25); // requires tweaking
+      int[][] thresholded = thresholdedges(normalThin, 0.1, 0.2); // requires tweaking
+      System.out.println("Converting to image and writing...");
+      BufferedImage threshImage = threshToImage(thresholded);
+      writeImage(threshImage, base_name + "_thresholded.png");
       System.out.println("Applying Blob Analysis...");
       boolean[][] blobbed = blobAnalysis(thresholded);
       System.out.println("Converting to image and writing...");
@@ -516,19 +519,22 @@ public class ComputerVision
       return img;
    }
    
-   public static int[][] thresholdedges(double[][] edges, double strongThresh, double weakThresh) {
+   public static int[][] thresholdedges(double[][] edges, double weakThresh, double strongThresh) {
       // 0 = none
       // 1 = weak
       // 2 = strong
       int[][] thresholded = new int[edges.length][edges[0].length];
       for(int i = 0; i < edges.length; i ++) {
          for(int j = 0; j < edges[0].length; j ++) {
-            if(edges[i][j] > strongThresh)
+            if(edges[i][j] > strongThresh) {
                thresholded[i][j] = 2;
-            else if(edges[i][j] > weakThresh)
+            }
+            else if(edges[i][j] > weakThresh) {
                thresholded[i][j] = 1;
-            else
+            }
+            else {
                thresholded[i][j] = 0;
+            }
          }
       }
       return thresholded;
@@ -619,6 +625,36 @@ public class ComputerVision
          }
       }
       return gauss;
+   }
+   
+   
+  /**
+   * Creates a BufferedImage object from a thresholded array (strong and weak thresholds),
+   * using white for strong thresholds, gray for weak thresholds, and black for all other
+   * points.
+   * 
+   * @param  threshed    integer 2D array representing thresholded values (2 for strong, 1 for weak)
+   * @return             BufferedImage object with representation of thresholded image
+   */
+   public static BufferedImage threshToImage(int[][] threshed) {
+      BufferedImage img = new BufferedImage(threshed.length, threshed[0].length, BufferedImage.TYPE_INT_ARGB);
+      for(int x = 0; x < threshed.length; x ++) {
+         for(int y = 0; y < threshed[0].length; y ++) {
+            switch(threshed[x][y]) {
+               case 0:
+                 setColor(img, x, y, new Color(0,0,0));
+                 break;
+               case 1:
+                 setColor(img, x, y, new Color(127,127,127));
+                 break;
+               case 2:
+                 setColor(img, x, y, new Color(255,255,255));
+                 break;
+               default: break;
+            }
+         }
+      }
+      return img;
    }
    
    
