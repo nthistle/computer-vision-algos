@@ -288,6 +288,15 @@ public class ComputerVision
       return normalized;
    }
    
+
+  /**
+   * Returns the difference of the two double arrays (typically representations 
+   * of images, but not a requirement)/
+   *
+   * @param  m1          the first double array to subtract
+   * @param  m2          the second double array to subtract
+   * @return             a double array containing values of (m1 - m2), irrespective of range of values
+   */
    public static double[][] difference(double[][] m1, double[][] m2) {
       double[][] diff = new double[m1.length][m1[0].length];
       for(int i = 0; i < m1.length; i ++) {
@@ -298,6 +307,14 @@ public class ComputerVision
       return diff;
    }
    
+   
+
+  /**
+   * Standard clone array method
+   *
+   * @param  m1          double array to clone
+   * @return             a deep copy of m1
+   */
    public static double[][] cloneArr(double[][] m1) {
       double[][] clone = new double[m1.length][m1[0].length];
       for(int i = 0; i < m1.length; i ++) {
