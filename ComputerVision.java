@@ -36,6 +36,11 @@ public class ComputerVision
       else if(command.equalsIgnoreCase("dog")) {
          differenceOfGaussians(args);
       }
+      else {
+         System.out.println("Command not recognized!");
+         System.out.println("usage: java ComputerVision {bin|edge|rgbedge|dog} image_name [gaussian_level]");
+         System.exit(-1);
+      }
    }
    
    public static void differenceOfGaussians(String[] args) {
