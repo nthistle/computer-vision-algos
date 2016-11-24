@@ -2,13 +2,14 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.awt.Color;
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.util.Random;
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.LinkedList;
 import java.lang.Math;
 
 
@@ -739,33 +740,43 @@ public class ComputerVision
    }
    
    private static void connectToRegion(int[][] map, int a, int b, int region) {
-      map[a][b] = region;
-      if(a > 0 && map[a-1][b]==0) {
-         connectToRegion(map, a-1, b, region);
-      }
-      if(b > 0 && map[a][b-1]==0) {
-         connectToRegion(map, a, b-1, region);
-      }
-      if(a < map.length-1 && map[a+1][b]==0) {
-         connectToRegion(map, a+1, b, region);
-      }
-      if(b < map[0].length-1 && map[a][b+1]==0) {
-         connectToRegion(map, a, b+1, region);
-      }
-      if(a > 0 && b > 0 && map[a-1][b-1]==0) {
-         connectToRegion(map, a-1, b-1, region);
-      }
-      if(a < map.length-1 && b > 0 && map[a+1][b-1]==0) {
-         connectToRegion(map, a+1, b-1, region);
-      }
-      if(a > 0 && b < map[0].length-1 && map[a-1][b+1]==0) {
-         connectToRegion(map, a-1, b+1, region);
-      }
-      if(a < map.length-1 && b < map[0].length-1 && map[a+1][b+1]==0) {
-         connectToRegion(map, a+1, b+1, region);
-      }
-   }
-   
+      LinkedList<Point> q = new LinkedList<Point>();
+      q.add(new Point(a, b));
+      Point cur;
+      int x, y;
+      while(!q.isEmpty()) {
+         cur = q.poll();
+         x = cur.x;
+         y = cur.y;
+         if(map[x][y] == 0) {
+            map[x][y] = region;
+            if(x > 0 && map[x-1][y]==0) {
+               q.add(new Point(x-1, y));
+            }
+            if(y > 0 && map[x][y-1]==0) {
+               q.add(new Point(x, y-1));
+            }
+            if(x < map.length-1 && map[x+1][y]==0) {
+               q.add(new Point(x+1, y));
+            }
+            if(y < map[0].length-1 && map[x][y+1]==0) {
+               q.add(new Point(x, y+1));
+            }
+            if(x > 0 && y > 0 && map[x-1][y-1]==0) {
+               q.add(new Point(x-1, y-1));
+            }
+            if(x < map.length-1 && y > 0 && map[x+1][y-1]==0) {
+               q.add(new Point(x+1, y-1));
+            }
+            if(x > 0 && y < map[0].length-1 && map[x-1][y+1]==0) {
+               q.add(new Point(x-1, y+1));
+            }
+            if(x < map.length-1 && y < map[0].length-1 && map[x+1][y+1]==0) {
+               q.add(new Point(x+1, y+1));
+            }
+         }   
+      }  
+   }   
   /**
    * Creates a BufferedImage object from a thresholded array (strong and weak thresholds),
    * using white for strong thresholds, gray for weak thresholds, and black for all other
