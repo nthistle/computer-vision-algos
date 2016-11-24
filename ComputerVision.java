@@ -849,7 +849,7 @@ public class ComputerVision
    // TODO: fix the monstrosity that is this style of coding
    // (make a matrix apply method, probably)
    public static double[][][] sobelRawRGB(BufferedImage img) {
-      double gx, gy;
+      double gxr, gxg, gxb, gyr, gyg, gyb;
       double[][][] grad = new double[img.getWidth()][img.getHeight()][2];
       for(int i = 0; i < img.getWidth(); i ++) {
          for(int j = 0; j < img.getHeight(); j ++) {
@@ -866,55 +866,57 @@ public class ComputerVision
             // Gy = [[-1,-2,-1],
             //       [ 0, 0, 0],
             //       [+1,+2,+1]]
-            gx = 0;
-            gx += (-1 * getColor(img, i-1, j-1).getRed());
-            gx += (-2 * getColor(img, i-1, j).getRed());
-            gx += (-1 * getColor(img, i-1, j+1).getRed());
-            gx += (1 * getColor(img, i+1, j-1).getRed());
-            gx += (2 * getColor(img, i+1, j).getRed());
-            gx += (1 * getColor(img, i+1, j+1).getRed());
+            gxr = 0;
+            gxr += (-1 * getColor(img, i-1, j-1).getRed());
+            gxr += (-2 * getColor(img, i-1, j).getRed());
+            gxr += (-1 * getColor(img, i-1, j+1).getRed());
+            gxr += (1 * getColor(img, i+1, j-1).getRed());
+            gxr += (2 * getColor(img, i+1, j).getRed());
+            gxr += (1 * getColor(img, i+1, j+1).getRed());
             
-            gx += (-1 * getColor(img, i-1, j-1).getGreen());
-            gx += (-2 * getColor(img, i-1, j).getGreen());
-            gx += (-1 * getColor(img, i-1, j+1).getGreen());
-            gx += (1 * getColor(img, i+1, j-1).getGreen());
-            gx += (2 * getColor(img, i+1, j).getGreen());
-            gx += (1 * getColor(img, i+1, j+1).getGreen());
+            gxg = 0;
+            gxg += (-1 * getColor(img, i-1, j-1).getGreen());
+            gxg += (-2 * getColor(img, i-1, j).getGreen());
+            gxg += (-1 * getColor(img, i-1, j+1).getGreen());
+            gxg += (1 * getColor(img, i+1, j-1).getGreen());
+            gxg += (2 * getColor(img, i+1, j).getGreen());
+            gxg += (1 * getColor(img, i+1, j+1).getGreen());
             
-            gx += (-1 * getColor(img, i-1, j-1).getBlue());
-            gx += (-2 * getColor(img, i-1, j).getBlue());
-            gx += (-1 * getColor(img, i-1, j+1).getBlue());
-            gx += (1 * getColor(img, i+1, j-1).getBlue());
-            gx += (2 * getColor(img, i+1, j).getBlue());
-            gx += (1 * getColor(img, i+1, j+1).getBlue());
+            gxb = 0;
+            gxb += (-1 * getColor(img, i-1, j-1).getBlue());
+            gxb += (-2 * getColor(img, i-1, j).getBlue());
+            gxb += (-1 * getColor(img, i-1, j+1).getBlue());
+            gxb += (1 * getColor(img, i+1, j-1).getBlue());
+            gxb += (2 * getColor(img, i+1, j).getBlue());
+            gxb += (1 * getColor(img, i+1, j+1).getBlue());
             
             
-            gy = 0;
-            gy += (-1 * getColor(img, i-1, j-1).getRed());
-            gy += (-2 * getColor(img, i, j-1).getRed());
-            gy += (-1 * getColor(img, i+1, j-1).getRed());
-            gy += (1 * getColor(img, i-1, j+1).getRed());
-            gy += (2 * getColor(img, i, j+1).getRed());
-            gy += (1 * getColor(img, i+1, j+1).getRed());
+            gyr = 0;
+            gyr += (-1 * getColor(img, i-1, j-1).getRed());
+            gyr += (-2 * getColor(img, i, j-1).getRed());
+            gyr += (-1 * getColor(img, i+1, j-1).getRed());
+            gyr += (1 * getColor(img, i-1, j+1).getRed());
+            gyr += (2 * getColor(img, i, j+1).getRed());
+            gyr += (1 * getColor(img, i+1, j+1).getRed());
             
-            gy = 0;
-            gy += (-1 * getColor(img, i-1, j-1).getGreen());
-            gy += (-2 * getColor(img, i, j-1).getGreen());
-            gy += (-1 * getColor(img, i+1, j-1).getGreen());
-            gy += (1 * getColor(img, i-1, j+1).getGreen());
-            gy += (2 * getColor(img, i, j+1).getGreen());
-            gy += (1 * getColor(img, i+1, j+1).getGreen());
+            gyg = 0;
+            gyg += (-1 * getColor(img, i-1, j-1).getGreen());
+            gyg += (-2 * getColor(img, i, j-1).getGreen());
+            gyg += (-1 * getColor(img, i+1, j-1).getGreen());
+            gyg += (1 * getColor(img, i-1, j+1).getGreen());
+            gyg += (2 * getColor(img, i, j+1).getGreen());
+            gyg += (1 * getColor(img, i+1, j+1).getGreen());
             
-            gy = 0;
-            gy += (-1 * getColor(img, i-1, j-1).getBlue());
-            gy += (-2 * getColor(img, i, j-1).getBlue());
-            gy += (-1 * getColor(img, i+1, j-1).getBlue());
-            gy += (1 * getColor(img, i-1, j+1).getBlue());
-            gy += (2 * getColor(img, i, j+1).getBlue());
-            gy += (1 * getColor(img, i+1, j+1).getBlue());
+            gyb = 0;
+            gyb += (-1 * getColor(img, i-1, j-1).getBlue());
+            gyb += (-2 * getColor(img, i, j-1).getBlue());
+            gyb += (-1 * getColor(img, i+1, j-1).getBlue());
+            gyb += (1 * getColor(img, i-1, j+1).getBlue());
+            gyb += (2 * getColor(img, i, j+1).getBlue());
+            gyb += (1 * getColor(img, i+1, j+1).getBlue());
                         
-            grad[i][j][0] = gx;
-            grad[i][j][1] = gy;
+            grad[i][j][0] = gxr + gxg + gxb;
+            grad[i][j][1] = gyr + gyg + gyb;
          }
       }
       return grad;
