@@ -14,12 +14,13 @@ import java.lang.Math;
 
 public class ComputerVision
 {
-
+   public static Random rand;
    public static final int BIN_SIZE = 256; // decimal grayscaled means this could be higher
    
    public static void main(String[] args) {
+      rand = new Random();
       if(args.length < 2) {
-         System.out.println("usage: java ComputerVision {edge|bin} image_name [gaussian_level]");
+         System.out.println("usage: java ComputerVision {bin|edge|rgbedge|dog} image_name [gaussian_level]");
          System.exit(-1);
       }
       String command = args[0];
@@ -99,7 +100,9 @@ public class ComputerVision
       System.out.println("Converting to image and writing...");
       BufferedImage binaryImage = grayToImage(binary);
       writeImage(binaryImage, base_name + "_binary.png");
-      
+      System.out.println("Coloring to image and writing...");
+      BufferedImage coloredBinary = binaryToColorImage(binary);
+      writeImage(coloredBinary, base_name + "_binary_colored.png");
    }
    
    public static void doEdgeDetect(String[] args) {
@@ -137,7 +140,7 @@ public class ComputerVision
       writeImage(thinImage, base_name + "_sobel_thin.png");
       
       System.out.println("Thresholding edges...");
-      int[][] thresholded = thresholdedges(normalThin, 0.1, 0.2); // requires tweaking
+      int[][] thresholded = thresholdedges(normalThin, 0.07, 0.2); // requires tweaking
       System.out.println("Converting to image and writing...");
       BufferedImage threshImage = threshToImage(thresholded);
       writeImage(threshImage, base_name + "_thresholded.png");
@@ -174,7 +177,7 @@ public class ComputerVision
       writeImage(thinImage, base_name + "_sobel_thin_rgb.png");
       
       System.out.println("Thresholding edges...");
-      int[][] thresholded = thresholdedges(normalThin, 0.1, 0.2); // requires tweaking
+      int[][] thresholded = thresholdedges(normalThin, 0.07, 0.2); // requires tweaking
       System.out.println("Converting to image and writing...");
       BufferedImage threshImage = threshToImage(thresholded);
       writeImage(threshImage, base_name + "_thresholded_rgb.png");
@@ -695,6 +698,68 @@ public class ComputerVision
       return gauss;
    }
    
+   // colors the BLACK regions
+   public static BufferedImage binaryToColorImage(double[][] binimg) {
+      int[][] distinctRegions = new int[binimg.length][binimg[0].length];
+      for(int i = 0; i < binimg.length; i ++) {
+         for(int j = 0; j < binimg[0].length; j ++) {
+            if(binimg[i][j] < 0.5)
+               distinctRegions[i][j] = 0; // unassigned
+            else
+               distinctRegions[i][j] = -1; 
+         }
+      }
+      int curRegion = 1;
+      for(int i = 0; i < distinctRegions.length; i ++) {
+         for(int j = 0; j < distinctRegions[0].length; j ++) {
+            if(distinctRegions[i][j] == 0) {
+               connectToRegion(distinctRegions, i, j, curRegion++);
+            }
+         }
+      }
+      Color[] distinctColors = new Color[curRegion];
+      for(int i = 0; i < curRegion; i ++) {
+         distinctColors[i] = getRandomColor();
+      }
+      BufferedImage img = new BufferedImage(distinctRegions.length, distinctRegions[0].length, BufferedImage.TYPE_INT_ARGB);
+      for(int i = 0; i < distinctRegions.length; i ++) {
+         for(int j = 0; j < distinctRegions[0].length; j ++) {
+            if(distinctRegions[i][j] == -1)
+               setColor(img, i, j, new Color(255,255,255));
+            else
+               setColor(img, i, j, distinctColors[distinctRegions[i][j]]);
+         }
+      }
+      return img;
+   }
+   
+   private static void connectToRegion(int[][] map, int a, int b, int region) {
+      map[a][b] = region;
+      if(a > 0 && map[a-1][b]==0) {
+         connectToRegion(map, a-1, b, region);
+      }
+      if(b > 0 && map[a][b-1]==0) {
+         connectToRegion(map, a, b-1, region);
+      }
+      if(a < map.length-1 && map[a+1][b]==0) {
+         connectToRegion(map, a+1, b, region);
+      }
+      if(b < map[0].length-1 && map[a][b+1]==0) {
+         connectToRegion(map, a, b+1, region);
+      }
+      if(a > 0 && b > 0 && map[a-1][b-1]==0) {
+         connectToRegion(map, a-1, b-1, region);
+      }
+      if(a < map.length-1 && b > 0 && map[a+1][b-1]==0) {
+         connectToRegion(map, a+1, b-1, region);
+      }
+      if(a > 0 && b < map[0].length-1 && map[a-1][b+1]==0) {
+         connectToRegion(map, a-1, b+1, region);
+      }
+      if(a < map.length-1 && b < map[0].length-1 && map[a+1][b+1]==0) {
+         connectToRegion(map, a+1, b+1, region);
+      }
+   }
    
   /**
    * Creates a BufferedImage object from a thresholded array (strong and weak thresholds),
@@ -845,7 +910,7 @@ public class ComputerVision
 
 
 
-   // linearly adds sobel from each rgb value
+   //
    // TODO: fix the monstrosity that is this style of coding
    // (make a matrix apply method, probably)
    public static double[][][] sobelRawRGB(BufferedImage img) {
@@ -931,6 +996,17 @@ public class ComputerVision
     private static void setColor(BufferedImage image, int x, int y, Color c) {
         int rgb = c.getRGB();
         image.setRGB(x,y,rgb);
+    }
+    
+    public static Color getRandomColor() {
+      int r, g, b;
+      do {
+         r = rand.nextInt(256);
+         g = rand.nextInt(256);
+         b = rand.nextInt(256);
+      } while((r+g+b)>500);
+      // we don't want something too close to white
+      return new Color(r, g, b);
     }
 
     /*
