@@ -26,6 +26,9 @@ public class ComputerVision
       if(command.equalsIgnoreCase("edgedetect") || command.equalsIgnoreCase("edge")) {
          doEdgeDetect(args);
       }
+      else if(command.equalsIgnoreCase("rgbedgedetect") || command.equalsIgnoreCase("rgbedge")) {
+         doRGBEdgeDetect(args);
+      }
       else if(command.equalsIgnoreCase("binarize") || command.equalsIgnoreCase("bin")) {
          doBinarize(args);
       }
@@ -143,6 +146,43 @@ public class ComputerVision
       System.out.println("Converting to image and writing...");
       BufferedImage edgeImage = booleanToImage(blobbed);
       writeImage(edgeImage, base_name + "_finaledges.png");
+      
+      //int[] histEdges = getHistogram(normalThin);
+      //int chosenThresh = otsuThreshold(histEdges);
+      //writeImage(histToImage(histEdges, chosenThresh), base_name + "_edgeshist.png");
+      //for(int i : histEdges) System.out.println(i);
+      //System.out.println("Thresh: " + chosenThresh);
+   }
+   
+   public static void doRGBEdgeDetect(String[] args) {
+      
+      int pos = args[1].lastIndexOf(".");
+      String base_name = args[1].substring(0,pos);
+   
+      System.out.println("Reading image...");
+      BufferedImage testImage = readImage(args[1]);
+      
+      System.out.println("Applying Sobel...");
+      double[][][] rawSobelIntensity = sobelRawRGB(testImage);
+      System.out.println("Applying Non-maximum suppression...");
+      double[][] thinned = nonmaxsuppression(rawSobelIntensity);
+      double[][] normalThin = normalize(thinned);
+      System.out.println("Converting to image and writing...");
+      BufferedImage sobelImage = grayToImage(normalize(sobelRawToParsed(rawSobelIntensity)));
+      writeImage(sobelImage, base_name + "_sobel_rgb.png");
+      BufferedImage thinImage = grayToImage(normalThin);
+      writeImage(thinImage, base_name + "_sobel_thin_rgb.png");
+      
+      System.out.println("Thresholding edges...");
+      int[][] thresholded = thresholdedges(normalThin, 0.1, 0.2); // requires tweaking
+      System.out.println("Converting to image and writing...");
+      BufferedImage threshImage = threshToImage(thresholded);
+      writeImage(threshImage, base_name + "_thresholded_rgb.png");
+      System.out.println("Applying Blob Analysis...");
+      boolean[][] blobbed = blobAnalysis(thresholded);
+      System.out.println("Converting to image and writing...");
+      BufferedImage edgeImage = booleanToImage(blobbed);
+      writeImage(edgeImage, base_name + "_finaledges_rgb.png");
       
       //int[] histEdges = getHistogram(normalThin);
       //int chosenThresh = otsuThreshold(histEdges);
@@ -805,8 +845,81 @@ public class ComputerVision
 
 
 
-
-
+   // linearly adds sobel from each rgb value
+   // TODO: fix the monstrosity that is this style of coding
+   // (make a matrix apply method, probably)
+   public static double[][][] sobelRawRGB(BufferedImage img) {
+      double gx, gy;
+      double[][][] grad = new double[img.getWidth()][img.getHeight()][2];
+      for(int i = 0; i < img.getWidth(); i ++) {
+         for(int j = 0; j < img.getHeight(); j ++) {
+            if(i == 0 || j == 0 || i == img.getWidth()-1 || j == img.getHeight()-1) {
+               grad[i][j][0] = 0.0;
+               grad[i][j][1] = 0.0;
+               continue;
+            }  
+            // uses the following matrices:
+            // Gx = [[-1, 0, +1],
+            //       [-2, 0, +2],
+            //       [-1, 0, +1]]
+            //
+            // Gy = [[-1,-2,-1],
+            //       [ 0, 0, 0],
+            //       [+1,+2,+1]]
+            gx = 0;
+            gx += (-1 * getColor(img, i-1, j-1).getRed());
+            gx += (-2 * getColor(img, i-1, j).getRed());
+            gx += (-1 * getColor(img, i-1, j+1).getRed());
+            gx += (1 * getColor(img, i+1, j-1).getRed());
+            gx += (2 * getColor(img, i+1, j).getRed());
+            gx += (1 * getColor(img, i+1, j+1).getRed());
+            
+            gx += (-1 * getColor(img, i-1, j-1).getGreen());
+            gx += (-2 * getColor(img, i-1, j).getGreen());
+            gx += (-1 * getColor(img, i-1, j+1).getGreen());
+            gx += (1 * getColor(img, i+1, j-1).getGreen());
+            gx += (2 * getColor(img, i+1, j).getGreen());
+            gx += (1 * getColor(img, i+1, j+1).getGreen());
+            
+            gx += (-1 * getColor(img, i-1, j-1).getBlue());
+            gx += (-2 * getColor(img, i-1, j).getBlue());
+            gx += (-1 * getColor(img, i-1, j+1).getBlue());
+            gx += (1 * getColor(img, i+1, j-1).getBlue());
+            gx += (2 * getColor(img, i+1, j).getBlue());
+            gx += (1 * getColor(img, i+1, j+1).getBlue());
+            
+            
+            gy = 0;
+            gy += (-1 * getColor(img, i-1, j-1).getRed());
+            gy += (-2 * getColor(img, i, j-1).getRed());
+            gy += (-1 * getColor(img, i+1, j-1).getRed());
+            gy += (1 * getColor(img, i-1, j+1).getRed());
+            gy += (2 * getColor(img, i, j+1).getRed());
+            gy += (1 * getColor(img, i+1, j+1).getRed());
+            
+            gy = 0;
+            gy += (-1 * getColor(img, i-1, j-1).getGreen());
+            gy += (-2 * getColor(img, i, j-1).getGreen());
+            gy += (-1 * getColor(img, i+1, j-1).getGreen());
+            gy += (1 * getColor(img, i-1, j+1).getGreen());
+            gy += (2 * getColor(img, i, j+1).getGreen());
+            gy += (1 * getColor(img, i+1, j+1).getGreen());
+            
+            gy = 0;
+            gy += (-1 * getColor(img, i-1, j-1).getBlue());
+            gy += (-2 * getColor(img, i, j-1).getBlue());
+            gy += (-1 * getColor(img, i+1, j-1).getBlue());
+            gy += (1 * getColor(img, i-1, j+1).getBlue());
+            gy += (2 * getColor(img, i, j+1).getBlue());
+            gy += (1 * getColor(img, i+1, j+1).getBlue());
+                        
+            grad[i][j][0] = gx;
+            grad[i][j][1] = gy;
+         }
+      }
+      return grad;
+   }
+    
     
     private static Color getColor(BufferedImage image, int x, int y) {
         int rgb = image.getRGB(x,y);
