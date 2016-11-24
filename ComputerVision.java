@@ -320,7 +320,7 @@ public class ComputerVision
       for(int i = 0; i < m1.length; i ++) {
          for(int j = 0; j < m1[0].length; j ++) {
             clone[i][j] = m1[i][j];
-         }      
+         }
       }
       return clone;
    }
@@ -458,6 +458,17 @@ public class ComputerVision
       return edgesFinal;
    }
    
+  /**
+   * Recursive helper method that turns all "weak" edges that are touching a "strong"
+   * edge into strong edges, lets us keep edges that are probably part of the real edge
+   * but have a low threshold value.
+   *
+   * @param  map         2D integer array representation of "strong" and "weak" edges
+   * @param  visited     boolean matrix to keep track of visited pixels, prevent infinite loop
+   * @param  a           current x index
+   * @param  b           current y index
+   * @return             whether or not pixel at (a, b) is connected to a "strong" edge
+   */
    private static boolean connectToStrong(int[][] map, boolean[][] visited, int a, int b) {
       if(map[a][b] == 2) return true;
       visited[a][b] = true;
