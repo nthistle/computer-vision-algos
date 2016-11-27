@@ -710,6 +710,7 @@ public class ComputerVision
       for(int i = 0; i < binimg.length; i ++) {
          for(int j = 0; j < binimg[0].length; j ++) {
             if(binimg[i][j] < 0.5)
+            //if(binimg[i][j] > 0.5)
                distinctRegions[i][j] = 0; // unassigned
             else
                distinctRegions[i][j] = -1; 
@@ -732,6 +733,7 @@ public class ComputerVision
          for(int j = 0; j < distinctRegions[0].length; j ++) {
             if(distinctRegions[i][j] == -1)
                setColor(img, i, j, new Color(255,255,255));
+               //setColor(img, i, j, new Color(0,0,0));
             else
                setColor(img, i, j, distinctColors[distinctRegions[i][j]]);
          }
@@ -777,6 +779,7 @@ public class ComputerVision
          }   
       }  
    }   
+   
   /**
    * Creates a BufferedImage object from a thresholded array (strong and weak thresholds),
    * using white for strong thresholds, gray for weak thresholds, and black for all other
@@ -807,6 +810,13 @@ public class ComputerVision
    }
    
    
+  /**
+   * Creates a BufferedImage object from a double 2D array representing grayscaled values
+   * in the range [0, 1]
+   * 
+   * @param  grayscaled  double 2D array representing image, values in range [0, 1]
+   * @return             BufferedImage object representing grayscaled image
+   */
    public static BufferedImage grayToImage(double[][] grayscaled) {
       BufferedImage img = new BufferedImage(grayscaled.length, grayscaled[0].length, BufferedImage.TYPE_INT_ARGB);
       for(int x = 0; x < grayscaled.length; x ++) {
@@ -819,7 +829,14 @@ public class ComputerVision
    }
 
 
-   // note: normalizes to range [0,1] from [0,255], no additional scaling
+  /**
+   * Creates a 2D double array representing a grayscaled image from a BufferedImage object,
+   * using multipliers of 0.30, 0.59, and 0.11 for red, green, and blue values, respectively.
+   * Values are directly scaled from [0, 255] to [0, 1].
+   * 
+   * @param  img         BufferedImage object
+   * @return             2D double array with values in range [0,1]
+   */
    public static double[][] grayscale(BufferedImage img) {
       double[][] grayscaled = new double[img.getWidth()][img.getHeight()];
       for(int x = 0; x < img.getWidth(); x ++) {
@@ -832,6 +849,15 @@ public class ComputerVision
    }
 
 
+  /**
+   * Applies the Sobel Operator 3x3 matrix to a supplied image, both in the x direction
+   * and in the y direction, and returns a 2D double array of the same size where the values
+   * represent sqrt(Gx^2 + Gy^2), with Gx being the Sobel gradient in the x direction and
+   * Gy being the Sobel gradient in the y direction.
+   * 
+   * @param  grayscaled  2D double array representing grayscale image
+   * @return             2D double array with values representing applied Sobel Operator
+   */
    public static double[][] sobelGradient(double[][] grayscaled) {
       double maxG = Double.NEGATIVE_INFINITY;
       double minG = Double.POSITIVE_INFINITY;
@@ -881,8 +907,16 @@ public class ComputerVision
    }
 
 
-
-
+  /**
+   * Applies the Sobel Operator 3x3 matrix to a supplied image, both in the x direction
+   * and in the y direction, and returns a 3D double array of the same size, but two values
+   * for each index, where the value at position 0 represents Gx and the value at position 1
+   * represents Gy, with Gx being the Sobel gradient in the x direction and
+   * Gy being the Sobel gradient in the y direction.
+   * 
+   * @param  grayscaled  2D double array representing grayscale image
+   * @return             3D double array with values representing applied Sobel Operator in the x and y directions
+   */
    public static double[][][] sobelRaw(double[][] grayscaled) {
       double gx, gy;
       double[][][] grad = new double[grayscaled.length][grayscaled[0].length][2];
