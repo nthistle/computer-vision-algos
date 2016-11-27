@@ -966,6 +966,10 @@ public class ComputerVision
    public static double[][][] sobelRawRGB(BufferedImage img) {
       double gxr, gxg, gxb, gyr, gyg, gyb;
       double[][][] grad = new double[img.getWidth()][img.getHeight()][2];
+      int[][][] rgbForm = getRGB(img);
+      int[][] red = rgbForm[0];
+      int[][] green = rgbForm[1];
+      int[][] blue = rgbForm[2];
       for(int i = 0; i < img.getWidth(); i ++) {
          for(int j = 0; j < img.getHeight(); j ++) {
             if(i == 0 || j == 0 || i == img.getWidth()-1 || j == img.getHeight()-1) {
@@ -1036,8 +1040,40 @@ public class ComputerVision
       }
       return grad;
    }
+   
+   private static int[][][] getRGB(BufferedImage img) {
+      int[][][] rgbform = new int[3][img.getWidth()][img.getHeight()];
+      for(int i = 0; i < img.getWidth(); i ++) {
+         for(int j = 0; j < img.getHeight(); j ++) {
+            rgbform[0][i][j] = getColor(img, i, j).getRed();
+            rgbform[1][i][j] = getColor(img, i, j).getGreen();
+            rgbform[2][i][j] = getColor(img, i, j).getBlue();
+         }
+      }
+      return rgbform;
+   }
+   
+   // assumes x and y are valid
+   private static double applyXSobel(int[][] base, int x, int y) {
+      return (-1 * (base[x-1][y-1] + base[x-1][y+1] + 2*base[x-1][y])) +
+                 (base[x+1][y-1] + base[x+1][y+1] + 2*base[x+1][y]);
+   }
     
+   private static double applyYSobel(int[][] base, int x, int y) {
+      return (-1 * (base[x-1][y-1] + base[x+1][y-1] + 2*base[x][y-1])) +
+                 (base[x-1][y+1] + base[x+1][y+1] + 2*base[x][y+1]);
+   }
+   
+   private static double applyXSobel(double[][] base, int x, int y) {
+      return (-1 * (base[x-1][y-1] + base[x-1][y+1] + 2*base[x-1][y])) +
+                 (base[x+1][y-1] + base[x+1][y+1] + 2*base[x+1][y]);
+   }
     
+   private static double applyYSobel(double[][] base, int x, int y) {
+      return (-1 * (base[x-1][y-1] + base[x+1][y-1] + 2*base[x][y-1])) +
+                 (base[x-1][y+1] + base[x+1][y+1] + 2*base[x][y+1]);
+   }
+   
     private static Color getColor(BufferedImage image, int x, int y) {
         int rgb = image.getRGB(x,y);
         return new Color(rgb);
