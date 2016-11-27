@@ -877,21 +877,8 @@ public class ComputerVision
             // Gy = [[-1,-2,-1],
             //       [ 0, 0, 0],
             //       [+1,+2,+1]]
-            gx = 0;
-            gx += (-1 * grayscaled[i-1][j-1]);
-            gx += (-2 * grayscaled[i-1][j]);
-            gx += (-1 * grayscaled[i-1][j+1]);
-            gx += (1 * grayscaled[i+1][j-1]);
-            gx += (2 * grayscaled[i+1][j]);
-            gx += (1 * grayscaled[i+1][j+1]);
-            
-            gy = 0;
-            gy += (-1 * grayscaled[i-1][j-1]);
-            gy += (-2 * grayscaled[i][j-1]);
-            gy += (-1 * grayscaled[i+1][j-1]);
-            gy += (1 * grayscaled[i-1][j+1]);
-            gy += (2 * grayscaled[i][j+1]);
-            gy += (1 * grayscaled[i+1][j+1]);
+            gx = applyXSobel(grayscaled, i, j);
+            gy = applyYSobel(grayscaled, i, j);
             
             grad[i][j] = Math.sqrt(gx*gx+gy*gy);
             if(grad[i][j] > maxG) maxG = grad[i][j];
@@ -927,29 +914,8 @@ public class ComputerVision
                grad[i][j][1] = 0.0;
                continue;
             }  
-            // uses the following matrices:
-            // Gx = [[-1, 0, +1],
-            //       [-2, 0, +2],
-            //       [-1, 0, +1]]
-            //
-            // Gy = [[-1,-2,-1],
-            //       [ 0, 0, 0],
-            //       [+1,+2,+1]]
-            gx = 0;
-            gx += (-1 * grayscaled[i-1][j-1]);
-            gx += (-2 * grayscaled[i-1][j]);
-            gx += (-1 * grayscaled[i-1][j+1]);
-            gx += (1 * grayscaled[i+1][j-1]);
-            gx += (2 * grayscaled[i+1][j]);
-            gx += (1 * grayscaled[i+1][j+1]);
-            
-            gy = 0;
-            gy += (-1 * grayscaled[i-1][j-1]);
-            gy += (-2 * grayscaled[i][j-1]);
-            gy += (-1 * grayscaled[i+1][j-1]);
-            gy += (1 * grayscaled[i-1][j+1]);
-            gy += (2 * grayscaled[i][j+1]);
-            gy += (1 * grayscaled[i+1][j+1]);
+            gx = applyXSobel(grayscaled, i, j);
+            gy = applyYSobel(grayscaled, i, j);
             
             grad[i][j][0] = gx;
             grad[i][j][1] = gy;
@@ -976,63 +942,14 @@ public class ComputerVision
                grad[i][j][0] = 0.0;
                grad[i][j][1] = 0.0;
                continue;
-            }  
-            // uses the following matrices:
-            // Gx = [[-1, 0, +1],
-            //       [-2, 0, +2],
-            //       [-1, 0, +1]]
-            //
-            // Gy = [[-1,-2,-1],
-            //       [ 0, 0, 0],
-            //       [+1,+2,+1]]
-            gxr = 0;
-            gxr += (-1 * getColor(img, i-1, j-1).getRed());
-            gxr += (-2 * getColor(img, i-1, j).getRed());
-            gxr += (-1 * getColor(img, i-1, j+1).getRed());
-            gxr += (1 * getColor(img, i+1, j-1).getRed());
-            gxr += (2 * getColor(img, i+1, j).getRed());
-            gxr += (1 * getColor(img, i+1, j+1).getRed());
+            }
+            gxr = applyXSobel(red, i, j);    
+            gxg = applyXSobel(green, i, j);    
+            gxb = applyXSobel(blue, i, j);  
             
-            gxg = 0;
-            gxg += (-1 * getColor(img, i-1, j-1).getGreen());
-            gxg += (-2 * getColor(img, i-1, j).getGreen());
-            gxg += (-1 * getColor(img, i-1, j+1).getGreen());
-            gxg += (1 * getColor(img, i+1, j-1).getGreen());
-            gxg += (2 * getColor(img, i+1, j).getGreen());
-            gxg += (1 * getColor(img, i+1, j+1).getGreen());
-            
-            gxb = 0;
-            gxb += (-1 * getColor(img, i-1, j-1).getBlue());
-            gxb += (-2 * getColor(img, i-1, j).getBlue());
-            gxb += (-1 * getColor(img, i-1, j+1).getBlue());
-            gxb += (1 * getColor(img, i+1, j-1).getBlue());
-            gxb += (2 * getColor(img, i+1, j).getBlue());
-            gxb += (1 * getColor(img, i+1, j+1).getBlue());
-            
-            
-            gyr = 0;
-            gyr += (-1 * getColor(img, i-1, j-1).getRed());
-            gyr += (-2 * getColor(img, i, j-1).getRed());
-            gyr += (-1 * getColor(img, i+1, j-1).getRed());
-            gyr += (1 * getColor(img, i-1, j+1).getRed());
-            gyr += (2 * getColor(img, i, j+1).getRed());
-            gyr += (1 * getColor(img, i+1, j+1).getRed());
-            
-            gyg = 0;
-            gyg += (-1 * getColor(img, i-1, j-1).getGreen());
-            gyg += (-2 * getColor(img, i, j-1).getGreen());
-            gyg += (-1 * getColor(img, i+1, j-1).getGreen());
-            gyg += (1 * getColor(img, i-1, j+1).getGreen());
-            gyg += (2 * getColor(img, i, j+1).getGreen());
-            gyg += (1 * getColor(img, i+1, j+1).getGreen());
-            
-            gyb = 0;
-            gyb += (-1 * getColor(img, i-1, j-1).getBlue());
-            gyb += (-2 * getColor(img, i, j-1).getBlue());
-            gyb += (-1 * getColor(img, i+1, j-1).getBlue());
-            gyb += (1 * getColor(img, i-1, j+1).getBlue());
-            gyb += (2 * getColor(img, i, j+1).getBlue());
-            gyb += (1 * getColor(img, i+1, j+1).getBlue());
+            gyr = applyYSobel(red, i, j);    
+            gyg = applyYSobel(green, i, j);    
+            gyb = applyYSobel(blue, i, j);  
                         
             grad[i][j][0] = gxr + gxg + gxb;
             grad[i][j][1] = gyr + gyg + gyb;
@@ -1052,6 +969,15 @@ public class ComputerVision
       }
       return rgbform;
    }
+   
+   // uses the following matrices:
+   // Gx = [[-1, 0, +1],
+   //       [-2, 0, +2],
+   //       [-1, 0, +1]]
+   //
+   // Gy = [[-1,-2,-1],
+   //       [ 0, 0, 0],
+   //       [+1,+2,+1]]
    
    // assumes x and y are valid
    private static double applyXSobel(int[][] base, int x, int y) {
