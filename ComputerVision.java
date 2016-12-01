@@ -926,9 +926,17 @@ public class ComputerVision
 
 
 
-   //
-   // TODO: fix the monstrosity that is this style of coding
-   // (make a matrix apply method, probably)
+  /**
+   * Applies the Sobel Operator 3x3 matrix to a supplied image in RGB, both in the x direction
+   * and in the y direction, and returns a 3D double array of the same size, but two values
+   * for each index, where the value at position 0 represents Gx and the value at position 1
+   * represents Gy, with Gx being the RGB Sobel gradient in the x direction (sum of Sobel gradient
+   * of the red, green, and blue) and Gy being the RGB Sobel gradient in the y direction (also sum
+   * of Sobel gradient of the red, green, and blue)
+   * 
+   * @param  img         BufferedImage representing RGB image to apply Sobel to
+   * @return             3D double array with values representing applied RGB Sobel Operator in the x and y directions
+   */
    public static double[][][] sobelRawRGB(BufferedImage img) {
       double gxr, gxg, gxb, gyr, gyg, gyb;
       double[][][] grad = new double[img.getWidth()][img.getHeight()][2];
@@ -958,6 +966,14 @@ public class ComputerVision
       return grad;
    }
    
+  /**
+   * Helper method that turns a BufferedImage into its red, green, and blue values represented
+   * as a 3D integer array, with rgb[0] representing a 2D integer array of the image's red values,
+   * rgb[1] being the blue values, and rgb[2] being the green values.
+   * 
+   * @param  img         BufferedImage representing RGB image
+   * @return             3D integer array representing the image's RGB values
+   */
    private static int[][][] getRGB(BufferedImage img) {
       int[][][] rgbform = new int[3][img.getWidth()][img.getHeight()];
       for(int i = 0; i < img.getWidth(); i ++) {
