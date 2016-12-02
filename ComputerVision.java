@@ -704,7 +704,13 @@ public class ComputerVision
       return gauss;
    }
    
-   // colors the BLACK regions
+   
+  /**
+   * Takes in a binary image and colorizes all the distinct black regions with random colors.
+   * 
+   * @param  binimg      2D double array representing binary image {0, 1}
+   * @return             BufferedImage with colored regions
+   */
    public static BufferedImage binaryToColorImage(double[][] binimg) {
       int[][] distinctRegions = new int[binimg.length][binimg[0].length];
       for(int i = 0; i < binimg.length; i ++) {
